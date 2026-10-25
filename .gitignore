@@ -1,0 +1,33 @@
+# --- Java / Maven ---
+backend/target/
+*.class
+*.jar
+!.mvn/wrapper/maven-wrapper.jar
+
+# --- Node / Vue ---
+frontend/node_modules/
+frontend/dist/
+*.local
+
+# --- Python ---
+ai-service/__pycache__/
+ai-service/**/__pycache__/
+ai-service/.pytest_cache/
+ai-service/.venv/
+ai-service/data/
+
+# --- Runtime data & secrets ---
+data/
+.env
+*.local.env
+**/application-local.yml
+
+# --- Logs ---
+logs/
+*.log
+
+# --- IDE ---
+.idea/
+*.iml
+.vscode/
+.DS_Store
