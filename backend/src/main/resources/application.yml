@@ -1,0 +1,89 @@
+server:
+  port: ${SERVER_PORT:8080}
+
+spring:
+  application:
+    name: devpilot-backend
+  datasource:
+    url: ${DB_URL:jdbc:mysql://127.0.0.1:3307/devpilot?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true&rewriteBatchedStatements=true}
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 2
+      connection-timeout: 5000
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: false
+  data:
+    redis:
+      host: ${REDIS_HOST:127.0.0.1}
+      port: ${REDIS_PORT:6379}
+      timeout: 2s
+      lettuce:
+        pool:
+          max-active: 8
+  servlet:
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 110MB
+  jackson:
+    time-zone: Asia/Shanghai
+    date-format: yyyy-MM-dd HH:mm:ss
+    default-property-inclusion: non_null
+
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true
+  global-config:
+    banner: false
+    db-config:
+      id-type: auto
+      logic-delete-field: deleted
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    tags-sorter: alpha
+    operations-sorter: alpha
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  health:
+    redis:
+      enabled: false   # Redis 可选降级，不作为整体健康依据（启动时日志会说明实际状态）
+
+devpilot:
+  jwt:
+    # 生产环境必须通过环境变量覆盖（≥32 字节），仅本地开发使用默认值
+    secret: ${JWT_SECRET:dev-only-secret-key-please-override-in-prod-0123456789}
+    expire-minutes: ${JWT_EXPIRE_MINUTES:120}
+  storage:
+    path: ${STORAGE_PATH:./data/storage}
+  ai:
+    base-url: ${AI_SERVICE_BASE_URL:http://127.0.0.1:8200}
+    internal-token: ${INTERNAL_TOKEN:dev-internal-token}
+    search-timeout-seconds: 15
+    agent-timeout-seconds: 150
+  cors:
+    origins: ${CORS_ORIGINS:http://localhost:5173,http://127.0.0.1:5173}
+  admin:
+    bootstrap-username: ${ADMIN_USERNAME:admin}
+    bootstrap-password: ${ADMIN_PASSWORD:admin123456}   # 生产必须覆盖；启动日志会提示
+  login:
+    max-fail-attempts: 5
+    lock-minutes: 10
+
+logging:
+  file:
+    name: logs/devpilot-backend.log
+  level:
+    root: INFO
+    com.devpilot: INFO
