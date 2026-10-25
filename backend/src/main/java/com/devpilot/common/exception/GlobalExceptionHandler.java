@@ -48,6 +48,13 @@ public class GlobalExceptionHandler {
                 .body(ApiResponse.of(ErrorCode.BAD_REQUEST, "上传文件过大（单包上限 100MB）"));
     }
 
+    @ExceptionHandler(org.springframework.web.method.annotation.MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<ApiResponse<Void>> handleTypeMismatch(
+            org.springframework.web.method.annotation.MethodArgumentTypeMismatchException e) {
+        return ResponseEntity.status(ErrorCode.BAD_REQUEST.getHttpStatus())
+                .body(ApiResponse.of(ErrorCode.BAD_REQUEST, "请求参数类型不正确: " + e.getName()));
+    }
+
     @ExceptionHandler({DuplicateKeyException.class})
     public ResponseEntity<ApiResponse<Void>> handleDuplicate(DuplicateKeyException e) {
         return ResponseEntity.status(ErrorCode.CONFLICT.getHttpStatus())

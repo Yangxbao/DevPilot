@@ -1,0 +1,114 @@
+/* DevPilot 设计规范：统一配色、间距、字体变量 */
+:root {
+  --dp-primary: #2f54eb;
+  --dp-primary-light: #e6ebff;
+  --dp-success: #52c41a;
+  --dp-warning: #faad14;
+  --dp-danger: #f5222d;
+  --dp-text: #262626;
+  --dp-text-secondary: #8c8c8c;
+  --dp-bg: #f5f7fa;
+  --dp-card-bg: #ffffff;
+  --dp-border: #e8e8ec;
+  --dp-radius: 8px;
+  --dp-gap: 16px;
+  --dp-sidebar-width: 220px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#app {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font-family: 'PingFang SC', 'Microsoft YaHei', 'Segoe UI', sans-serif;
+  color: var(--dp-text);
+  background: var(--dp-bg);
+  font-size: 14px;
+}
+
+.dp-page {
+  padding: var(--dp-gap);
+}
+
+.dp-card {
+  background: var(--dp-card-bg);
+  border: 1px solid var(--dp-border);
+  border-radius: var(--dp-radius);
+  padding: var(--dp-gap);
+}
+
+.dp-page-title {
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0 0 4px;
+}
+
+.dp-page-sub {
+  color: var(--dp-text-secondary);
+  margin: 0 0 var(--dp-gap);
+}
+
+.dp-code {
+  font-family: 'JetBrains Mono', Consolas, monospace;
+  font-size: 12px;
+  background: #f6f8fa;
+  border: 1px solid var(--dp-border);
+  border-radius: 6px;
+  padding: 10px 12px;
+  white-space: pre-wrap;
+  word-break: break-all;
+  max-height: 320px;
+  overflow: auto;
+  line-height: 1.6;
+}
+
+.dp-inline-code {
+  font-family: Consolas, monospace;
+  background: #f0f2f5;
+  border-radius: 4px;
+  padding: 1px 6px;
+  font-size: 12px;
+}
+
+.dp-toolbar {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: var(--dp-gap);
+}
+
+.dp-evidence {
+  border-left: 3px solid var(--dp-primary);
+  background: #fafbff;
+  border-radius: 6px;
+  padding: 10px 12px;
+  margin-bottom: 10px;
+}
+
+.dp-evidence-meta {
+  color: var(--dp-text-secondary);
+  font-size: 12px;
+  margin-bottom: 6px;
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.dp-steps li {
+  margin-bottom: 4px;
+}
+
+@media (max-width: 768px) {
+  :root {
+    --dp-sidebar-width: 64px;
+  }
+  .dp-page {
+    padding: 10px;
+  }
+}
