@@ -1,7 +1,7 @@
 """SQLite 检索库：每个仓库一个库文件，可随时删除重建（派生数据）。
 
 - 关键词通道：FTS5 全文索引（bm25 排序）；中文按二元组(bigram)预处理索引与查询，
-  弥补 unicode61 分词器不支持 CJK 词组匹配的问题。
+  弥补 unicode61 分词器不支持 CJK 词组匹配的问题（"登录接口" 索引为 "登录 录接 接口"）。
 - 向量通道：chunks.embedding BLOB（float32 数组），余弦相似度纯 Python 计算。
 - Embedding 不可用时：只建 FTS，返回 vector_enabled=False（诚实降级）。
 

@@ -1,0 +1,100 @@
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: devpilot-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root-please-change}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-devpilot}
+      MYSQL_USER: ${MYSQL_USER:-devpilot}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-devpilot123}
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    volumes:
+      - mysql-data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-p${MYSQL_ROOT_PASSWORD:-root-please-change}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    container_name: devpilot-redis
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  ai-service:
+    build:
+      context: .
+      dockerfile: docker/ai-service.Dockerfile
+    container_name: devpilot-ai
+    environment:
+      INTERNAL_TOKEN: ${INTERNAL_TOKEN:-dev-internal-token}
+      LLM_PROVIDER: ${LLM_PROVIDER:-mock}
+      LLM_BASE_URL: ${LLM_BASE_URL:-https://api.openai.com/v1}
+      LLM_API_KEY: ${LLM_API_KEY:-}
+      LLM_MODEL: ${LLM_MODEL:-gpt-4o-mini}
+      EMBEDDING_PROVIDER: ${EMBEDDING_PROVIDER:-hashing}
+      EMBEDDING_BASE_URL: ${EMBEDDING_BASE_URL:-https://api.openai.com/v1}
+      EMBEDDING_API_KEY: ${EMBEDDING_API_KEY:-}
+      EMBEDDING_MODEL: ${EMBEDDING_MODEL:-text-embedding-3-small}
+      AI_DATA_DIR: /app/data/index-store
+    volumes:
+      - ai-data:/app/data
+    ports:
+      - "8200:8200"
+    depends_on:
+      redis:
+        condition: service_healthy
+
+  backend:
+    build:
+      context: .
+      dockerfile: docker/backend.Dockerfile
+    container_name: devpilot-backend
+    environment:
+      DB_URL: jdbc:mysql://mysql:3306/${MYSQL_DATABASE:-devpilot}?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true
+      DB_USERNAME: ${MYSQL_USER:-devpilot}
+      DB_PASSWORD: ${MYSQL_PASSWORD:-devpilot123}
+      REDIS_HOST: redis
+      REDIS_PORT: "6379"
+      JWT_SECRET: ${JWT_SECRET:-dev-only-secret-key-please-override-in-prod-0123456789}
+      ADMIN_USERNAME: ${ADMIN_USERNAME:-admin}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-admin123456}
+      STORAGE_PATH: /app/data/storage
+      AI_SERVICE_BASE_URL: http://ai-service:8200
+      INTERNAL_TOKEN: ${INTERNAL_TOKEN:-dev-internal-token}
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:5173,http://localhost:8090}
+    volumes:
+      - backend-data:/app/data
+    ports:
+      - "8080:8080"
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      ai-service:
+        condition: service_started
+
+  frontend:
+    build:
+      context: .
+      dockerfile: docker/frontend.Dockerfile
+    container_name: devpilot-frontend
+    ports:
+      - "8090:80"
+    depends_on:
+      backend:
+        condition: service_started
+
+volumes:
+  mysql-data:
+  ai-data:
+  backend-data:

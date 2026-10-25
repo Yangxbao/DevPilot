@@ -54,7 +54,13 @@ public final class Chunker {
             return List.of();
         }
         String[] lines = content.split("\n", -1);
-        if (lines.length == 1 && lines[0].isEmpty()) {
+        // 以 \n 结尾的文本 split 会多出一个空尾条目，剔除以免行号虚高
+        if (lines.length > 0 && lines[lines.length - 1].isEmpty()) {
+            String[] trimmed = new String[lines.length - 1];
+            System.arraycopy(lines, 0, trimmed, 0, trimmed.length);
+            lines = trimmed;
+        }
+        if (lines.length == 0) {
             return List.of();
         }
         List<Chunk> result = new java.util.ArrayList<>();

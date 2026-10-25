@@ -1,0 +1,82 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  backend:
+    name: 后端 · Java 21 / Spring Boot 测试
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: devpilot_test
+        ports:
+          - 3307:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -proot"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+      - name: 运行测试（真实 MySQL）
+        working-directory: backend
+        env:
+          TEST_DB_USERNAME: root
+          TEST_DB_PASSWORD: root
+        run: mvn -B test
+
+  ai-service:
+    name: AI 服务 · Python / FastAPI 测试
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - name: 安装依赖
+        working-directory: ai-service
+        run: pip install -r requirements.txt
+      - name: 运行 pytest
+        working-directory: ai-service
+        run: python -m pytest tests/ -q
+
+  frontend:
+    name: 前端 · Vue3 构建与测试
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - name: 安装依赖
+        working-directory: frontend
+        run: npm ci --no-audit --no-fund
+      - name: 类型检查 + 构建
+        working-directory: frontend
+        run: npm run build
+      - name: 单元测试
+        working-directory: frontend
+        run: npm test
+
+  compose-validate:
+    name: Docker Compose 配置校验
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: 校验 compose 文件
+        run: docker compose config -q

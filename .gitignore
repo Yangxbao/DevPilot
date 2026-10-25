@@ -21,6 +21,8 @@ data/
 .env
 *.local.env
 **/application-local.yml
+# 例外：演示工程中的假 .env（内容为虚构占位符，用于验证敏感文件过滤），见 fixtures/README
+!fixtures/demo-repo-src/demo-task-app/.env
 
 # --- Logs ---
 logs/

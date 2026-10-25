@@ -250,7 +250,7 @@ public class ImportService {
     }
 
     /** zip 条目路径安全化：拒绝目录穿越/绝对路径/盘符，返回规范化的相对路径（/ 分隔） */
-    static String sanitizeEntryPath(String rawName) {
+    public static String sanitizeEntryPath(String rawName) {
         String name = rawName.replace('\\', '/');
         if (name.startsWith("/") || name.contains("../") || name.contains("/..")
                 || name.matches("^[A-Za-z]:.*") || name.contains("\0")) {
@@ -268,7 +268,7 @@ public class ImportService {
         return name;
     }
 
-    static boolean isSensitiveName(String lowerFileName) {
+    public static boolean isSensitiveName(String lowerFileName) {
         return SENSITIVE_NAME_RULES.stream().anyMatch(lowerFileName::contains);
     }
 

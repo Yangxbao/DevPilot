@@ -10,6 +10,8 @@ import re
 import time
 from dataclasses import dataclass, field
 
+from pydantic import ValidationError
+
 from . import retrieval
 from .config import Settings
 from .embeddings import EmbeddingProvider

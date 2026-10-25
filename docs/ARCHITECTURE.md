@@ -94,7 +94,7 @@ com.devpilot
 MVP 的问答/分析单次 < 90s，同步请求 + 前端加载态 + 90s 总超时即可；引入消息队列属于 P1（异步任务化已列入路线图）。避免 MVP 阶段为了架构表演引入 MQ。
 
 ### 4.3 并发与幂等
-- **索引任务防重复**：`index_task.active` 虚拟列技巧——PENDING/RUNNING 时为 1、终态置 NULL，配合 `UNIQUE(repository_id, active)` 让数据库拒绝同一仓库的并发重复任务。
+- **索引任务防重复**：`index_task.active` 列由应用维护——PENDING/RUNNING 时为 1、终态置 NULL，配合 `UNIQUE(repository_id, active)` 让数据库拒绝同一仓库的并发重复任务（NULL 不参与唯一约束，历史任务可共存）。
 - **导入安全**：zip 条目数/总大小/单文件大小三重上限、Zip-Slip 规范路径校验、扩展名白名单、目录黑名单（node_modules/target/…）、二进制探测，全部拒绝时记录原因不中断导入。
 - **用户导入的代码永远不执行**：解析是纯文本 IO；Git 导入仅 `git clone --depth 1` 公开 HTTPS 仓库，URL 协议白名单校验。
 

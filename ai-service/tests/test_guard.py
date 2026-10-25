@@ -17,8 +17,12 @@ def test_benign_code_not_flagged():
 
 
 def test_sanitize_redacts_secrets():
-    cleaned = sanitize_for_log("key=sk-abcdefghijklmnop1234 and ghp_abcdefghij1234567890")
-    assert "sk-abcdefghijklmnop1234" not in cleaned
+    # 故意用拼接构造假密钥，避免仓库被密钥扫描器误报
+    fake_openai = "sk-" + "abcdefghij" + "12345678"
+    fake_github = "ghp_" + "abcdefghij" + "123456789012"
+    cleaned = sanitize_for_log(f"key={fake_openai} and {fake_github}")
+    assert fake_openai not in cleaned
+    assert fake_github not in cleaned
     assert "***" in cleaned
 
 
